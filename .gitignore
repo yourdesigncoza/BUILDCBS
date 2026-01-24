@@ -1,0 +1,19 @@
+# Environment files (contain secrets)
+.env
+
+# Dependencies
+/vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+console.txt

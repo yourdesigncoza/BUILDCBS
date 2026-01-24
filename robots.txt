@@ -1,0 +1,11 @@
+# BuildCBS Robots.txt
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://buildcbs.co.za/sitemap.xml
+
+# Disallow admin/config files
+Disallow: /includes/
+Disallow: /vendor/
+Disallow: /send-mail.php
