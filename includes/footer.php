@@ -90,6 +90,12 @@
             selector: '.glightbox',
             touchNavigation: true,
             loop: true,
+            onOpen: function() {
+                // Fix aria-hidden focus issue - blur trigger before aria-hidden is set
+                if (document.activeElement) {
+                    document.activeElement.blur();
+                }
+            }
         });
     </script>
 </body>

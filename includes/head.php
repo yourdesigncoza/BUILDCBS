@@ -84,6 +84,9 @@ $page_url = SITE_URL . ($_SERVER['REQUEST_URI'] ?? '/');
         /* Smooth scroll */
         html { scroll-behavior: smooth; }
 
+        /* GLightbox font fix */
+        .gslide-title, .gslide-desc, .glightbox-container { font-family: 'Inter', sans-serif; }
+
         /* Masonry layout */
         .masonry {
             column-count: 1;

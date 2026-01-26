@@ -1,10 +1,9 @@
 <?php
 /**
- * BuildCBS Projects Gallery
+ * BuildCBS Projects Gallery - Magazine Style Layout
  */
 require_once 'includes/config.php';
 require_once 'includes/projects-data.php';
-require_once 'includes/before-after-data.php';
 
 $page_title = 'Our Projects - ' . SITE_NAME;
 $page_description = 'View our portfolio of timber decking, renovations, and custom builds across the Garden Route. Quality craftsmanship in Mossel Bay, George, Glentana, and more.';
@@ -23,77 +22,101 @@ require_once 'includes/header.php';
         </div>
     </section>
 
-    <!-- Filter & Gallery -->
-    <section class="py-16 bg-white" x-data="{ filter: 'all' }">
+    <!-- Projects Grid -->
+    <section class="py-16 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            <!-- Filter Buttons -->
-            <div class="flex flex-wrap justify-center gap-3 mb-12">
-                <?php foreach ($categories as $key => $label): ?>
-                <button @click="filter = '<?= $key ?>'"
-                        :class="filter === '<?= $key ?>' ? 'bg-brand-orange text-white' : 'bg-brand-light text-brand-charcoal hover:bg-brand-orange/10'"
-                        class="px-6 py-2 rounded-full font-medium transition-colors">
-                    <?= $label ?>
-                </button>
-                <?php endforeach; ?>
-            </div>
+            <!-- Magazine-Style Grid: 2 cols desktop, 1 col mobile -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <?php foreach ($projects as $index => $project):
+                    $assets = getProjectAssets($project['id']);
+                    $lazyLoad = $index >= 4 ? 'lazy' : 'eager';
+                ?>
+                <article class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
 
-            <!-- Masonry Gallery -->
-            <div class="masonry">
-                <?php foreach ($projects as $project): ?>
-                <div class="masonry-item"
-                     x-show="filter === 'all' || filter === '<?= $project['category'] ?>'"
-                     x-transition:enter="transition ease-out duration-300"
-                     x-transition:enter-start="opacity-0 scale-95"
-                     x-transition:enter-end="opacity-100 scale-100">
-                    <div class="group relative overflow-hidden rounded-lg shadow-lg bg-gray-100">
-                        <!-- Main Image (links to lightbox) -->
-                        <a href="<?= $project['thumbnail'] ?>"
-                           class="glightbox block"
-                           data-gallery="projects"
-                           data-title="<?= htmlspecialchars($project['title']) ?>"
-                           data-description="<?= htmlspecialchars($project['location']) ?> &bull; <?= htmlspecialchars($project['material']) ?>">
-                            <img src="<?= $project['thumbnail'] ?>"
-                                 alt="<?= htmlspecialchars($project['title']) ?>"
-                                 class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
-                                 loading="lazy"
-                                 onerror="this.src='<?= BASE_URL ?>assets/images/hero/hero.jpg'">
+                    <!-- Image Section -->
+                    <div class="grid <?= $assets['has_before'] ? 'grid-cols-2' : 'grid-cols-1' ?> gap-2 p-2">
 
-                            <!-- Overlay -->
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                                <span class="inline-block bg-brand-orange text-white text-xs font-semibold px-3 py-1 rounded-full mb-2 w-fit">
-                                    <?= ucfirst($project['category']) ?>
-                                </span>
-                                <h3 class="text-white font-bold text-xl mb-1"><?= htmlspecialchars($project['title']) ?></h3>
-                                <p class="text-gray-300 text-sm mb-2">
-                                    <?= htmlspecialchars($project['location']) ?> &bull; <?= htmlspecialchars($project['material']) ?>
-                                </p>
-                                <p class="text-gray-400 text-sm line-clamp-2">
-                                    <?= htmlspecialchars($project['description']) ?>
-                                </p>
-                            </div>
-                        </a>
-
-                        <!-- Additional images for lightbox (hidden) -->
-                        <?php if (count($project['images']) > 1): ?>
-                            <?php foreach (array_slice($project['images'], 1) as $image): ?>
-                            <a href="<?= $image ?>"
-                               class="glightbox hidden"
-                               data-gallery="projects"
-                               data-title="<?= htmlspecialchars($project['title']) ?>"
-                               data-description="<?= htmlspecialchars($project['location']) ?>">
+                        <?php if ($assets['has_before']): ?>
+                        <!-- Before Image -->
+                        <div class="relative">
+                            <span class="absolute top-2 left-2 bg-gray-800/90 text-white px-3 py-1 text-xs font-semibold rounded z-10">Before</span>
+                            <a href="<?= BASE_URL . $assets['before'] ?>"
+                               class="glightbox block"
+                               data-gallery="project-<?= $project['id'] ?>"
+                               data-title="<?= htmlspecialchars($project['title']) ?> - Before">
+                                <img src="<?= BASE_URL . $assets['before'] ?>"
+                                     alt="<?= htmlspecialchars($project['title']) ?> before renovation"
+                                     class="w-full h-48 object-cover rounded-lg hover:opacity-90 transition-opacity"
+                                     loading="<?= $lazyLoad ?>">
                             </a>
-                            <?php endforeach; ?>
+                        </div>
+                        <?php endif; ?>
+
+                        <!-- After/Thumbnail Image -->
+                        <div class="relative <?= $assets['has_before'] ? '' : '' ?>">
+                            <?php if ($assets['has_before']): ?>
+                            <span class="absolute top-2 left-2 bg-brand-orange text-white px-3 py-1 text-xs font-semibold rounded z-10">After</span>
+                            <?php endif; ?>
+                            <a href="<?= $project['thumbnail'] ?>"
+                               class="glightbox block"
+                               data-gallery="project-<?= $project['id'] ?>"
+                               data-title="<?= htmlspecialchars($project['title']) ?>">
+                                <img src="<?= $project['thumbnail'] ?>"
+                                     alt="<?= htmlspecialchars($project['title']) ?> completed project"
+                                     class="w-full h-48 object-cover rounded-lg hover:opacity-90 transition-opacity"
+                                     loading="<?= $lazyLoad ?>">
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Hidden gallery images for lightbox -->
+                    <?php if (!empty($assets['images'])): ?>
+                        <?php foreach ($assets['images'] as $image): ?>
+                        <a href="<?= BASE_URL . $image ?>"
+                           class="glightbox hidden"
+                           data-gallery="project-<?= $project['id'] ?>"
+                           data-title="<?= htmlspecialchars($project['title']) ?>"></a>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+
+                    <!-- Details Section -->
+                    <div class="p-6">
+                        <!-- Category Badge -->
+                        <span class="inline-block bg-brand-orange/10 text-brand-orange text-xs font-semibold px-3 py-1 rounded-full mb-3">
+                            <?= ucfirst($project['category']) ?>
+                        </span>
+
+                        <!-- Title & Location -->
+                        <h3 class="text-xl font-bold text-brand-charcoal mb-1">
+                            <?= htmlspecialchars($project['title']) ?>
+                        </h3>
+                        <p class="text-sm text-gray-500 mb-3">
+                            <?= htmlspecialchars($project['location']) ?> &bull; <?= htmlspecialchars($project['material']) ?>
+                        </p>
+
+                        <!-- Scope (if available) -->
+                        <?php if (!empty($project['scope'])): ?>
+                        <p class="text-gray-600 line-clamp-3 mb-3">
+                            <?= htmlspecialchars($project['scope']) ?>
+                        </p>
+                        <?php else: ?>
+                        <p class="text-gray-600 line-clamp-3 mb-3">
+                            <?= htmlspecialchars($project['description']) ?>
+                        </p>
+                        <?php endif; ?>
+
+                        <!-- Materials & Challenges (if available) -->
+                        <?php if (!empty($project['materials_detail'])): ?>
+                        <div class="flex flex-wrap gap-2 text-sm">
+                            <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full">
+                                <strong>Materials:</strong> <?= htmlspecialchars($project['materials_detail']) ?>
+                            </span>
+                        </div>
                         <?php endif; ?>
                     </div>
-                </div>
+                </article>
                 <?php endforeach; ?>
-            </div>
-
-            <!-- Empty State -->
-            <div x-show="document.querySelectorAll('.masonry-item[style*=\'display: none\']').length === <?= count($projects) ?>"
-                 class="text-center py-12 text-gray-500">
-                <p>No projects found in this category.</p>
             </div>
         </div>
     </section>
@@ -108,87 +131,6 @@ require_once 'includes/header.php';
             <a href="<?= BASE_URL ?>contact.php" class="inline-block bg-brand-orange text-white px-8 py-4 rounded-md font-semibold text-lg hover:bg-orange-600 transition-colors">
                 Get a Free Quote
             </a>
-        </div>
-    </section>
-
-    <!-- Before & After Section -->
-    <section class="py-16 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-            <!-- Section Header -->
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-brand-charcoal mb-4">Our Work in Action</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">
-                    See the remarkable transformations we've achieved for our clients
-                </p>
-            </div>
-
-            <!-- Before/After Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                <?php foreach ($beforeAfterProjects as $project): ?>
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden" x-data="{ activeTab: 'before' }">
-
-                    <!-- Tab Toggle -->
-                    <div class="flex border-b border-gray-200">
-                        <button @click="activeTab = 'before'"
-                            :class="activeTab === 'before' ? 'bg-brand-orange text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-                            class="flex-1 py-3 px-4 font-semibold transition-colors">
-                            Before
-                        </button>
-                        <button @click="activeTab = 'after'"
-                            :class="activeTab === 'after' ? 'bg-brand-orange text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-                            class="flex-1 py-3 px-4 font-semibold transition-colors">
-                            After
-                        </button>
-                    </div>
-
-                    <!-- Before Images -->
-                    <div x-show="activeTab === 'before'"
-                         x-transition:enter="transition ease-out duration-300"
-                         x-transition:enter-start="opacity-0"
-                         x-transition:enter-end="opacity-100"
-                         class="grid grid-cols-2 gap-2 p-4">
-                        <?php foreach ($project['before_images'] as $image): ?>
-                        <a href="<?= $image ?>"
-                           class="glightbox"
-                           data-gallery="<?= $project['id'] ?>-before"
-                           data-title="<?= htmlspecialchars($project['title']) ?> - Before">
-                            <img src="<?= $image ?>"
-                                 alt="<?= htmlspecialchars($project['title']) ?> before"
-                                 class="w-full h-32 object-cover rounded hover:opacity-90 transition-opacity"
-                                 loading="lazy">
-                        </a>
-                        <?php endforeach; ?>
-                    </div>
-
-                    <!-- After Images -->
-                    <div x-show="activeTab === 'after'"
-                         x-transition:enter="transition ease-out duration-300"
-                         x-transition:enter-start="opacity-0"
-                         x-transition:enter-end="opacity-100"
-                         class="grid grid-cols-2 gap-2 p-4">
-                        <?php foreach ($project['after_images'] as $image): ?>
-                        <a href="<?= $image ?>"
-                           class="glightbox"
-                           data-gallery="<?= $project['id'] ?>-after"
-                           data-title="<?= htmlspecialchars($project['title']) ?> - After">
-                            <img src="<?= $image ?>"
-                                 alt="<?= htmlspecialchars($project['title']) ?> after"
-                                 class="w-full h-32 object-cover rounded hover:opacity-90 transition-opacity"
-                                 loading="lazy">
-                        </a>
-                        <?php endforeach; ?>
-                    </div>
-
-                    <!-- Title -->
-                    <div class="p-4 pt-0">
-                        <h3 class="text-lg font-semibold text-brand-charcoal">
-                            <?= htmlspecialchars($project['title']) ?>
-                        </h3>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-            </div>
         </div>
     </section>
 
