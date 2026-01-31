@@ -27,6 +27,15 @@ if (!verify_csrf($csrf_token)) {
     exit;
 }
 
+// Honeypot spam check - if filled, it's a bot
+$honeypot = filter_input(INPUT_POST, 'website', FILTER_SANITIZE_SPECIAL_CHARS);
+if (!empty($honeypot)) {
+    error_log("Honeypot triggered - spam blocked from IP: " . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
+    // Silently "succeed" so bot thinks submission worked
+    header('Location: ' . BASE_URL . 'contact.php?status=success');
+    exit;
+}
+
 // Sanitize inputs
 $name = trim(filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS) ?? '');
 $email = trim(filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL) ?? '');

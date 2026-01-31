@@ -60,6 +60,12 @@ require_once 'includes/header.php';
                     <form action="<?= BASE_URL ?>send-mail.php" method="POST" class="space-y-6">
                         <?= csrf_field() ?>
 
+                        <!-- Honeypot spam trap - bots fill this, humans don't see it -->
+                        <div class="hp-field" aria-hidden="true">
+                            <label for="website">Website</label>
+                            <input type="text" name="website" id="website" tabindex="-1" autocomplete="off">
+                        </div>
+
                         <!-- Name -->
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700 mb-1">

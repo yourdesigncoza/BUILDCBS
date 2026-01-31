@@ -102,5 +102,8 @@ $page_url = SITE_URL . ($_SERVER['REQUEST_URI'] ?? '/');
             break-inside: avoid;
             margin-bottom: 1.5rem;
         }
+
+        /* Honeypot spam trap - hidden from humans */
+        .hp-field { position: absolute; left: -9999px; }
     </style>
 </head>
